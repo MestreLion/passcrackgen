@@ -40,7 +40,6 @@
 int
 main (int argc, char **argv)
 {
-  struct secrets sec;
   struct stat stat_buf;
 
   fprintf (stderr, "%s (Passcrack) %s\nCopyright (C) 2012  Rodrigo Silva\n"
@@ -49,11 +48,6 @@ main (int argc, char **argv)
       "under the GNU Public License, version 3 or later.\n\n",
       PROGRAM, VERSION);
 
-  if (mlock (&sec, sizeof (struct secrets))) {
-    perror ("mlock: ");
-    fprintf (stderr, "(%s should be installed setuid root)\n", PROGRAM);
-    exit (2);
-  }
   if (setreuid (getuid (), getuid ())) {
     perror ("setreuid: ");
     exit (3);
