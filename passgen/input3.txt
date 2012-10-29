@@ -1,0 +1,8 @@
+123	321	999	666
+aaa	AAA	aaaaa	AAAAA
+foo	Foo	FOO
+bar	Bar	BAR
+passgen	Passgen	passGen	PassGen	PASSGEN
+xxx	yyy	zzz
+a@b.com	z@y.net
+this	will	be	HUGE!
