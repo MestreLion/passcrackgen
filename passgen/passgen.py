@@ -24,6 +24,25 @@ import itertools
 import argparse
 import logging as logger
 from math import log, ceil, factorial as fac
+from threading import Timer
+
+class RepeatedTimer(object):
+    def __init__(self, interval, function):
+        self.function = function
+        self.interval = interval
+        self._timer = None
+        self.start()
+
+    def _run(self):
+        self.start()
+        self.function()
+
+    def start(self):
+        self._timer = Timer(self.interval, self._run)
+        self._timer.start()
+
+    def stop(self):
+        self._timer.cancel()
 
 def totalguess(v, n, n0=1):
     return sum([int(ceil(v**r)) * fac(n) / fac(n-r)
@@ -52,8 +71,8 @@ def humantime(s):
     if s < c*y: return "%d months"  % (s/M)
     return             "%d years"   % (s/y)
 
-def feedback(total):
-    log.info("{:,} passwords written".format(total))
+def feedback():
+    logger.info("{:,} passwords written".format(total))
 
 def parseargs():
     parser = argparse.ArgumentParser(
@@ -117,7 +136,7 @@ if __name__ == "__main__":
     variations_geomean = geomean(num_variations)
     variations_avgsize = sum([len(v) for t in search for v in t])/tot_variations
     guess = totalguess(variations_geomean, args.maxterms, args.minterms)
-    logger.info("Output estimative: ~{:,} passwords, {:,} KiB, {} at 1MiB/s"
+    logger.info("Output estimative: ~{:,} passwords, {:,} KiB, {} at 1M pwds/sec"
                 "".format(roundmag(guess, 3),
                           roundmag(float(variations_avgsize *
                                        args.maxterms *
@@ -127,6 +146,7 @@ if __name__ == "__main__":
     total = 0
     with open(args.outfile, 'w') if args.outfile else sys.stdout as f:
         try:
+            rt = RepeatedTimer(30, feedback)
             for r in range(args.minterms, args.maxterms+1):
                 for p in itertools.permutations(search, r):
                     for pwd in itertools.product(*p):
@@ -135,4 +155,5 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             pass
         finally:
+            rt.stop()
             logger.info("{:,} total passwords written".format(total))
