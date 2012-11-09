@@ -5,8 +5,8 @@ keyid=$1
 passfile=$2
 
 # Tunables
-sdelta=5
-cdelta=10
+sdelta=60
+cdelta=100
 log=$HOME/.passcrack.log
 
 start=$(date +%s)
@@ -35,6 +35,7 @@ keymsg=$(gpg --list-secret-keys --with-colons "$keyid" | head -n1)
 feedback="%s: tried %d (%d passwords/sec). Total: %d, last: %s\n"
 
 printf "Password Cracker\nCracking %s\nUsing %s\n" "$keymsg" "$passfile"
+printf "Status feedback every %d seconds\n" "$sdelta"
 while read -r password; do
 
 	crack "$password" && exit
